@@ -3,4 +3,4 @@ My avoiding obstacle robot with GenuinoMega
 
 #Motor schema
 
-![alt text](https://raw.githubusercontent.com/Trafitto/Abortino/master/to/Abortino_motor_schema.png)
+![alt text](https://github.com/Trafitto/Abortino/blob/master/Abortino_motor_schema.png)
