@@ -19,10 +19,10 @@ int distanza;
 int durata;
 
 const int LedPin = 51; 
-const int LedForPing = 52 //DA VERIFICARE IL NUMERO DI PING
+const int LedForPing = 52; //DA VERIFICARE IL NUMERO DI PING
 Servo headServo;
 
-
+int scannedDistanceFW;
 const int DangerDistance=25; //La distanza  dall'ostacolo
 int scannedPing;
 
@@ -56,14 +56,14 @@ void loop()
         delay(10);
         scannedDistanceFW=letturaSensoreUltrasuoni();
         //Serial.println(scannedPing);
-        if (scannedDistance>DangerDistance)  //se la distanza rilevata è maggiore della distanza "Pericolosa" va avanti
+        if (scannedDistanceFW>DangerDistance)  //se la distanza rilevata ï¿½ maggiore della distanza "Pericolosa" va avanti
         {
           
           delay(10); 
           GO_FORWARD();
 
         }
-        else if (scannedDistance<=DangerDistance)//Atrimenti guarda a sinistra poi a destra e sceglie il percorso ottimale
+        else if (scannedDistanceFW<=DangerDistance)//Atrimenti guarda a sinistra poi a destra e sceglie il percorso ottimale
         {
           
             STOP(); //si ferma 
@@ -97,7 +97,7 @@ int TURN_HEAD_SX()
     delay(10);
     headServo.write(180); //RUOTA LA TESTA A SX
 	BLINK_LED(1,LedPin); //LAMPEGGIA UNA VOLTA QUANDO HA FINITO DI RUOTARE LA TESTA
-	delay(1000); //DIAMOLI IL TEMPO DI GIRARE gira più a lungo perche è girato           
+	delay(1000); //DIAMOLI IL TEMPO DI GIRARE gira piï¿½ a lungo perche ï¿½ girato           
 	distanceSX=letturaSensoreUltrasuoni(); //LEGGO E MEMORIZZO COSA TROVO A SX
 	
 	BLINK_LED(3,LedPin); //Blinka per indicare se ha finito
@@ -140,7 +140,7 @@ void GO_BACKWARD(int nBk)
   //delay(25);
 
 }
-void GO_FORWARD() //questo non ha il loop perche è usato già in un loop
+void GO_FORWARD() //questo non ha il loop perche ï¿½ usato giï¿½ in un loop
 {
      motorDX.run(FORWARD); 
      motorSX.run(FORWARD); 
@@ -185,9 +185,9 @@ int  letturaSensoreUltrasuoni()
 //Potrebbe essere superfluo passare la distanza rilevata a dritto
 void choseDirection(int distFW,int distSX, int distDX)
 {
-	int differenceFW,differenceSX,differenceDX
+	int differenceFW=0,differenceSX=0,differenceDX=0;
 	
-	differenceFW=distFW-DangerDistance; //distFW è sempre minore rispento a DangerDistance
+	differenceFW=distFW-DangerDistance; //distFW ï¿½ sempre minore rispento a DangerDistance
 	differenceSX=distSX-DangerDistance;
 	differenceDX=distDX-DangerDistance;
 	
@@ -206,7 +206,7 @@ void choseDirection(int distFW,int distSX, int distDX)
 	}
 	else if (differenceSX==differenceDX && differenceSX>differenceFW)  
 	{
-		//un pizzico di casualità
+		//un pizzico di casualitï¿½
 		long rand =random(99); //numero random da 0 a 99 (sono 100 numeri)
 		if (rand>=50)
 		{
