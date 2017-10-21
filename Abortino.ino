@@ -47,27 +47,31 @@ void setup()
     motorSX.setSpeed(250);
 	
     STOP();
+    Serial.println("Avvio");
 }
 
 void loop()
 {
 //ho rimosso il codice per i comandi wifi tramite il bit -> con arduino mega posso usare la porta Serial1
 
-        delay(10);
+       
         scannedDistanceFW=letturaSensoreUltrasuoni();
-        //Serial.println(scannedPing);
+      
+        Serial.print("Distanza Rilevata: ");
+         Serial.println(scannedDistanceFW);
+        
         if (scannedDistanceFW>DangerDistance)  //se la distanza rilevata � maggiore della distanza "Pericolosa" va avanti
         {
           
-          delay(10); 
+          
           GO_FORWARD();
-
+          
         }
         else if (scannedDistanceFW<=DangerDistance)//Atrimenti guarda a sinistra poi a destra e sceglie il percorso ottimale
         {
           
             STOP(); //si ferma 
-            
+            delay(20);
             distanceSX=TURN_HEAD_SX(); //Gira la testa a SX e leggo la distanza
             
             distanceDX=TURN_HEAD_DX(); //Gira la testa a DX e leggo la distanza
@@ -99,7 +103,8 @@ int TURN_HEAD_SX()
 	BLINK_LED(1,LedPin); //LAMPEGGIA UNA VOLTA QUANDO HA FINITO DI RUOTARE LA TESTA
 	delay(1000); //DIAMOLI IL TEMPO DI GIRARE gira pi� a lungo perche � girato           
 	distanceSX=letturaSensoreUltrasuoni(); //LEGGO E MEMORIZZO COSA TROVO A SX
-	
+        Serial.print("Distanza Rilevata SX: ");
+	Serial.println(distanceSX);
 	BLINK_LED(3,LedPin); //Blinka per indicare se ha finito
     return distanceSX;
 }
@@ -109,8 +114,9 @@ int  TURN_HEAD_DX()
     headServo.write(0); //RUOTA LA TESTA A DX
 	BLINK_LED(1,LedPin); //LAMPEGGIA UNA VOLTA QUANDO HA FINITO DI RUOTARE LA TESTA
 	delay(1000);  //DIAMOLI IL TEMPO DI GIRARE     
-	distanceDX=letturaSensoreUltrasuoni(); //LEGGO E MEMORIZZO COSA TROVO A DESTRA  
-	
+	distanceDX=letturaSensoreUltrasuoni(); //LEGGO E MEMORIZZO COSA TROVO A DESTRA
+     Serial.print("Distanza Rilevata DX: ");
+	Serial.println(distanceDX);
 	BLINK_LED(3,LedPin); //Blinka per indicare se ha finito
     return distanceDX;
 }
@@ -147,40 +153,36 @@ void GO_FORWARD() //questo non ha il loop perche � usato gi� in un loop
      
 }
 
-void TURN_SX(int nSx)
+void TURN_SX()
 {
-  for (int i=0;i<nSx;i++)
-  { 
-          
+  
+      Serial.print("Giro a SX ");
      motorSX.run(BACKWARD);
      motorDX.run(RELEASE);
-     //delay(15); //SONO SUPERFLUI SE SI VUOLE AVERE UN MOVIMENTO UNIFORME ????
+     delay(100); 
       
- }
- //delay(25);
+
 }
 
-void TURN_DX(int nDx)
+void TURN_DX()
 {
-   for (int i=0;i<nDx;i++)
-  {  
+ 
+    Serial.print("Giro a DX ");
      motorSX.run(RELEASE); 
      motorDX.run(BACKWARD);
-     //delay(15); //SONO SUPERFLUI SE SI VUOLE AVERE UN MOVIMENTO UNIFORME ????
-   }
-   //delay(25);  //SONO SUPERFLUI SE SI VUOLE AVERE UN MOVIMENTO UNIFORME ????
+     delay(100); 
+
 }
 
 
 int  letturaSensoreUltrasuoni()
 {
-    digitalWrite(TrigPin, HIGH);
-    delayMicroseconds(2);                  // mantiene alto il trigger per almeno 2us
     digitalWrite(TrigPin, LOW);
+    delayMicroseconds(2);                  // mantiene alto il trigger per almeno 2us
+    digitalWrite(TrigPin, HIGH);
     delayMicroseconds(5); 
     durata = pulseIn(EchoPin, HIGH);
-	BLINK_LED(2,LedForPing); //Lampeggia due volte per indicare che ha rilevato la distanza
-  return  distanza = (durata/2)/29;
+  return  distanza = (durata/2)/29.1;
 }
 //Potrebbe essere superfluo passare la distanza rilevata a dritto
 void choseDirection(int distFW,int distSX, int distDX)
@@ -198,11 +200,11 @@ void choseDirection(int distFW,int distSX, int distDX)
 	
 	if (differenceSX>differenceDX && differenceSX>differenceFW)
 	{
-		TURN_SX(5);
+		TURN_SX();
 	}
 	else if (differenceDX>differenceSX  && differenceDX>differenceFW)
 	{
-		TURN_DX(5); 
+		TURN_DX(); 
 	}
 	else if (differenceSX==differenceDX && differenceSX>differenceFW)  
 	{
@@ -210,11 +212,11 @@ void choseDirection(int distFW,int distSX, int distDX)
 		long rand =random(99); //numero random da 0 a 99 (sono 100 numeri)
 		if (rand>=50)
 		{
-			TURN_DX(5);
+			TURN_DX();
 		}
 		else
 		{
-			TURN_SX(5);
+			TURN_SX();
 		}
 	}
 	else if (differenceFW>=differenceSX && differenceFW>=differenceDX)
@@ -226,11 +228,11 @@ void choseDirection(int distFW,int distSX, int distDX)
 		long rando =random(99);
 		if (rando>=50)
 		{
-			TURN_DX(5);
+			TURN_DX();
 		}
 		else
 		{
-			TURN_SX(5);
+			TURN_SX();
 		}
 	}
 	
@@ -239,4 +241,5 @@ void choseDirection(int distFW,int distSX, int distDX)
     delay(50);
 	WATCH_FORWARD(); //Per sicurezza rimposto l'head al centro
 	STOP(); //Per sicurezza stoppo di nuovo i motori
+
 }
