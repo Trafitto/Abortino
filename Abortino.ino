@@ -1,4 +1,4 @@
-//12/05/2017
+//23/13/2017
 /*
 * BORCHI MARCO -ABORTino MEGA (Now with Genuino Mega)
 * Avoiding obsacle robot with rotate head
@@ -7,9 +7,23 @@
 //!!!!!! ---> TO TEST <--- !!!!!!!!!!
 
 
+//Motor
 #include <AFMotor.h>
 #include <Servo.h>
 
+//Display
+#include <SPI.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+//Display settings
+#define OLED_MOSI  44 //D1 on my display
+#define OLED_CLK   42 //D0
+#define OLED_DC    11
+#define OLED_CS    12
+#define OLED_RESET 13
+Adafruit_SSD1306 display(OLED_MOSI, OLED_CLK, OLED_DC, OLED_RESET, OLED_CS);
 
 // specifica i pin di trig e echo usati per il sensore ad ultrasuoni
 const int TrigPin = 50; //14 su arduino 50 su mega
@@ -40,6 +54,10 @@ void setup()
     pinMode(EchoPin, INPUT);
     pinMode(LedPin, OUTPUT);
 	pinMode(LedForPing, OUTPUT);
+	
+	display.begin(SSD1306_SWITCHCAPVCC);
+	// Clear the buffer.
+	display.clearDisplay();
     
     headServo.attach(10); //CONFIG HEAD	
 	WATCH_FORWARD(); //SETTA AL CENTRO IL SERVO MOTORE
@@ -92,6 +110,16 @@ void BLINK_LED(int blinky, int ledPin)
       digitalWrite(LedPin, LOW);
       delay(100);
   }
+}
+
+void WRITE_DISPLAY(String text )
+{
+	display.setTextSize(1);
+	display.setTextColor(WHITE);
+	display.setCursor(0,0);
+	display.println(text);
+  
+	display.display();
 }
 
 int TURN_HEAD_SX()
